@@ -7,14 +7,10 @@ port = 1
 sock=bluetooth.BluetoothSocket( bluetooth.RFCOMM )
 sock.connect((bd_addr, port))
 print 'Connected'
-#sock.settimeout(1.0)
-#sock.send("x")
-#print 'Sent data'
 
 while True:
-
     data = sock.recv(50)
-    print 'received [%s]'%data
-    time.sleep(1)
+    print data
+    time.sleep(0.5)
 
 sock.close()
