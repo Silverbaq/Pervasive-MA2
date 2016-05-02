@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.graphics.Matrix;
 import android.provider.SyncStateContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -23,12 +26,45 @@ import app.akexorcist.bluetotohspp.library.DeviceList;
 public class MainActivity extends AppCompatActivity {
 
     BluetoothSPP bt;
+    private ImageView mImageView;
+
+    // image position
+    float currentImageX, currentImageY;
+
+    // Image zoom
+    private Matrix matrix = new Matrix();
+    float zoom = 0;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Button btnConnect = (Button) findViewById(R.id.btnConnect);
+        mImageView = (ImageView) findViewById(R.id.imageView);
+
+        Button btn1 = (Button) findViewById(R.id.button);
+        Button btn2 = (Button) findViewById(R.id.button2);
+
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zoomImageIn(0.1f);
+            }
+        });
+
+        btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zoomImageOut(0.1f);
+            }
+        });
+
         bt = new BluetoothSPP(this);
+
+
+
+        // *** BLUETOOTH ***
 
         if (!bt.isBluetoothAvailable()) {
             Toast.makeText(getApplicationContext()
@@ -65,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button btnConnect = (Button) findViewById(R.id.btnConnect);
+
 
         //
         // To list devices to connect to
@@ -80,6 +116,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    // *** Bluetooth settings ***
+    // *** BEGIN ***
 
     public void onDestroy() {
         super.onDestroy();
@@ -121,4 +160,47 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    // *** Bluetooth settings ***
+    // *** END ***
+
+
+    // *** Image control **
+    // *** BEGIN ***
+
+    private void moveImageDown(float speed){
+        mImageView.scrollBy(0,(int)speed);
+    }
+
+    private void moveImageUp(float speed){
+        mImageView.scrollBy(0,(int)speed);
+    }
+
+    private void moveImageLeft(float speed){
+        mImageView.scrollBy((int)speed,0);
+    }
+
+    private void moveImageRight(float speed){
+        mImageView.scrollBy((int)speed,0);
+    }
+
+    private void zoomImageIn(float speed){
+
+
+        float x = mImageView.getScaleX();
+        float y = mImageView.getScaleY();
+
+        mImageView.setScaleX((float) (x+speed));
+        mImageView.setScaleY((float) (y+speed));
+
+    }
+
+    private void zoomImageOut(float speed){
+        float x = mImageView.getScaleX();
+        float y = mImageView.getScaleY();
+
+        mImageView.setScaleX((float) (x-speed));
+        mImageView.setScaleY((float) (y-speed));
+    }
+    // *** Image control **
+    // *** END ***
 }

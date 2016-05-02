@@ -13,4 +13,5 @@ while True:
     print data
     time.sleep(0.5)
 
+
 sock.close()

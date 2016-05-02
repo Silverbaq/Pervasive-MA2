@@ -3,7 +3,7 @@
 import serial
 from time import sleep
 
-bluetoothSerial = serial.Serial( "/dev/rfcomm1", baudrate=9600 )
+bluetoothSerial = serial.Serial( "/dev/rfcomm1", baudrate=4800 )
 
 while True:
     print bluetoothSerial.readline()
