@@ -7,7 +7,7 @@
 #include <SoftwareSerial.h>
 #include <Wire.h>
 
-SoftwareSerial mySerial(30,31); // RX, TX
+SoftwareSerial mySerial(3,2); // RX, TX
 
 int q[6]; //hold q values
 int incomingByte = 0;   // for incoming serial data
