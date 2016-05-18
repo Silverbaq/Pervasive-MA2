@@ -15,9 +15,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import org.java_websocket.server.WebSocketServer;
+
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Observable;
+import java.util.Observer;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
@@ -35,6 +43,11 @@ public class MainActivity extends AppCompatActivity {
     private Matrix matrix = new Matrix();
     float zoom = 0;
 
+    // Socket server
+    ServerSocket server;
+    boolean running = false;
+
+    //SimpleServer server;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,11 +70,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 zoomImageOut(0.1f);
+
+                // ***** TEST WEB SOCKET SERVER ****
+                startServer();
             }
         });
 
         bt = new BluetoothSPP(this);
-
 
 
         // *** BLUETOOTH ***
@@ -102,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
         //
         // To list devices to connect to
         btnConnect.setOnClickListener(new View.OnClickListener() {
@@ -140,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setup() {
-      // TODO: code for setup if needed
+        // TODO: code for setup if needed
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -167,40 +181,116 @@ public class MainActivity extends AppCompatActivity {
     // *** Image control **
     // *** BEGIN ***
 
-    private void moveImageDown(float speed){
-        mImageView.scrollBy(0,(int)speed);
+    private void moveImageDown(float speed) {
+        mImageView.scrollBy(0, (int) speed);
     }
 
-    private void moveImageUp(float speed){
-        mImageView.scrollBy(0,(int)speed);
+    private void moveImageUp(float speed) {
+        mImageView.scrollBy(0, (int) speed);
     }
 
-    private void moveImageLeft(float speed){
-        mImageView.scrollBy((int)speed,0);
+    private void moveImageLeft(float speed) {
+        mImageView.scrollBy((int) speed, 0);
     }
 
-    private void moveImageRight(float speed){
-        mImageView.scrollBy((int)speed,0);
+    private void moveImageRight(float speed) {
+        mImageView.scrollBy((int) speed, 0);
     }
 
-    private void zoomImageIn(float speed){
+    private void zoomImageIn(float speed) {
 
 
         float x = mImageView.getScaleX();
         float y = mImageView.getScaleY();
 
-        mImageView.setScaleX((float) (x+speed));
-        mImageView.setScaleY((float) (y+speed));
+        mImageView.setScaleX((float) (x + speed));
+        mImageView.setScaleY((float) (y + speed));
 
     }
 
-    private void zoomImageOut(float speed){
+    private void zoomImageOut(float speed) {
         float x = mImageView.getScaleX();
         float y = mImageView.getScaleY();
 
-        mImageView.setScaleX((float) (x-speed));
-        mImageView.setScaleY((float) (y-speed));
+        mImageView.setScaleX((float) (x - speed));
+        mImageView.setScaleY((float) (y - speed));
     }
+
+
     // *** Image control **
     // *** END ***
+
+
+    public void startServer() {
+        running = true;
+        int port = 5000;
+        String ip = "0.0.0.0";
+
+
+        try {
+            server = new ServerSocket(port);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("SERVER", "Server started");
+        Log.d("SERVER", server.getInetAddress().getHostAddress());
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (running) {
+                    Socket client = null;
+                    try {
+                        client = server.accept();
+
+                        clientHandler(client);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        });
+        t.start();
+    }
+
+    void clientHandler(Socket socket) {
+        Log.d("SERVER", "Someone connected!!!");
+        try {
+            DataInputStream dIn = new DataInputStream(socket.getInputStream());
+
+            while (true) {
+                // TODO : CODE!!
+                String input = dIn.readLine();
+                Log.d("SERVER", input);
+
+                switch (input) {
+                    case "1":
+                        moveImageLeft(10);
+                        break;
+                    case "2":
+                        moveImageRight(-10);
+                        break;
+                    case "3":
+                        moveImageUp(10);
+                        break;
+                    case "4":
+                        moveImageDown(-10);
+                        break;
+                    case "5":
+                        zoomImageIn(0.2f);
+                        break;
+                    case "6":
+                        zoomImageOut(0.2f);
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
