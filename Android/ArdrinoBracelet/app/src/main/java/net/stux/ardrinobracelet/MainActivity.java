@@ -62,14 +62,15 @@ public class MainActivity extends AppCompatActivity {
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                zoomImageIn(0.1f);
+                //zoomImageIn(0.1f);
+                running = false;
             }
         });
 
         btn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                zoomImageOut(0.1f);
+                //zoomImageOut(0.1f);
 
                 // ***** TEST WEB SOCKET SERVER ****
                 startServer();
