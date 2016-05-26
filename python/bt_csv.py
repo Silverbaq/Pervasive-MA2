@@ -8,6 +8,8 @@ port = 1
 
 input = []
 
+
+g = 'OUT'
 def connect_and_record():
     sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
     sock.connect((bd_addr, port))
@@ -21,18 +23,21 @@ def connect_and_record():
             # Checks if the data is ok
             tmp = data.split(',')
             if len(tmp) == 6:
+                t = time.time()
+                data += ','+str(t)
+                tt = str(t)
                 input.append(data)
-            time.sleep(0.5)
+            time.sleep(0.05)
     except KeyboardInterrupt:
         pass
 
     sock.close()    # closes the socket connection
-    write_cvs()     # Writes all records to cvs file.
+    write_cvs(tt)     # Writes all records to cvs file.
 
 
-def write_cvs():
-    with open('records.csv', 'w') as csvfile:
-        fieldnames = ['ax', 'ay', 'az', 'gx', 'gy', 'gz']
+def write_cvs(tt):
+    with open('records'+ tt + g + '.csv', 'w') as csvfile:
+        fieldnames = ['ax', 'ay', 'az', 'gx', 'gy', 'gz', 'time', 'gesture']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
@@ -44,7 +49,9 @@ def write_cvs():
             gx = d[3]
             gy = d[4]
             gz = d[5]
-            writer.writerow({'ax': ax, 'ay': ay, 'az': az, 'gx': gx, 'gy': gy, 'gz': gz})
+            t = d[6]
+            gesture = g
+            writer.writerow({'ax': ax, 'ay': ay, 'az': az, 'gx': gx, 'gy': gy, 'gz': gz, 'time': t, 'gesture': gesture})
 
 
 if __name__ == '__main__':
